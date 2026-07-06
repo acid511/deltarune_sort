@@ -438,6 +438,12 @@ function App() {
           </div>
         </section>
       )}
+
+      <footer className="app-footer">
+        <a href="https://github.com/acid511/deltarune_sort" target="_blank" rel="noopener noreferrer">
+          GitHub: acid511/deltarune_sort
+        </a>
+      </footer>
     </main>
   );
 }

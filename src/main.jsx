@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, ChevronLeft, Headphones, ListChecks, Moon, Play, RotateCcw, Search, Sun, Undo2 } from 'lucide-react';
+import { Check, ChevronLeft, Eye, EyeOff, Headphones, ListChecks, Moon, Play, RotateCcw, Search, Sun, Undo2 } from 'lucide-react';
 import packageJson from '../package.json';
 import './styles.css';
 
@@ -67,12 +67,25 @@ function resolveSongTitle(raw, fallback) {
   return normalizeLocalizedText(raw, fallback);
 }
 
+// 曲説明
+function resolveSongDescription(raw) {
+  const description = pick(raw, ['description', 'desc', 'details', 'note', '説明'], '');
+  if (description && typeof description === 'object' && !Array.isArray(description)) {
+    return getLocalizedText(description, 'en') || getLocalizedText(description, 'ja') || '';
+  }
+  return String(description || '').trim();
+}
+
 // 多言語対応のテキストを取得
 function getLocalizedText(value, language) {
   if (!value) return '';
   if (typeof value === 'string') return value;
   return String(value?.[language] || value?.en || value?.ja || '');
 }
+
+const FORWARD_SCROLL_SPEED_PX_PER_MS = 48 / 1000;
+const HOLD_AT_END_MS = 1000;
+const HOLD_AT_START_MS = 1000;
 
 const songs = Object.entries(modules).flatMap(([path, module]) => {
   const fileLabel = path.replace('./assets/json/', '').replace(/\.json$/i, '');
@@ -81,6 +94,7 @@ const songs = Object.entries(modules).flatMap(([path, module]) => {
     const title = resolveSongTitle(raw, fallbackTitle);
     const titleLabel = title.en || title.ja || fallbackTitle;
     const artist = pick(raw, ['artist', 'artists', 'singer', 'vocal', 'artistName', 'artist_name', 'アーティスト']);
+    const description = resolveSongDescription(raw);
     const chapter = pick(raw, ['chapter', 'category', 'album', 'group', 'section', 'チャプター'], fileLabel);
     const previewUrl = pick(raw, ['preview_url', 'previewUrl', 'preview', 'audio', 'audioUrl', 'audio_url']);
     const spotifyUrl = pick(raw, ['spotify_url', 'spotifyUrl', 'spotify', 'external_url', 'externalUrl', 'url']);
@@ -88,6 +102,7 @@ const songs = Object.entries(modules).flatMap(([path, module]) => {
       id: pick(raw, ['id', 'track_id', 'trackId'], `${fileLabel}-${index}-${titleLabel}`),
       title,
       artist: Array.isArray(artist) ? artist.join(', ') : String(artist || ''),
+      description,
       chapter: String(chapter || fileLabel),
       previewUrl: String(previewUrl || ''),
       spotifyUrl: String(spotifyUrl || ''),
@@ -178,11 +193,18 @@ function SongMedia({ song, compact = false, darkMode = false }) {
   );
 }
 
-// タイトルが見切れる場合に自動でスクロール
-function AutoScrollTitle({ children }) {
+// ホバー時に見切れたテキストをスクロール
+function HoverScrollText({ as = 'strong', className = '', children, hovered = false, timings = null, onMeasure }) {
   const containerRef = React.useRef(null);
   const textRef = React.useRef(null);
+  const frameRef = React.useRef(0);
+  const startRef = React.useRef(0);
   const [scrollDistance, setScrollDistance] = React.useState(0);
+  const Tag = as;
+
+  React.useEffect(() => {
+    onMeasure?.(scrollDistance);
+  }, [onMeasure, scrollDistance]);
 
   React.useEffect(() => {
     const measure = () => {
@@ -199,14 +221,103 @@ function AutoScrollTitle({ children }) {
     return () => resizeObserver.disconnect();
   }, [children]);
 
+  React.useEffect(() => {
+    const text = textRef.current;
+    if (!text || !hovered || scrollDistance <= 0 || !timings) {
+      cancelAnimationFrame(frameRef.current);
+      startRef.current = 0;
+      if (text) text.style.transform = 'translateX(0px)';
+      return undefined;
+    }
+
+    const { forwardDuration, cycleDuration } = timings;
+    const forwardLimit = forwardDuration;
+    const holdEndLimit = forwardDuration + HOLD_AT_END_MS;
+    const holdStartLimit = holdEndLimit + HOLD_AT_START_MS;
+
+    const tick = (now) => {
+      if (!startRef.current) startRef.current = now;
+      const elapsed = now - startRef.current;
+      const phase = elapsed % cycleDuration;
+      let offset = 0;
+
+      if (phase < forwardLimit) {
+        offset = -Math.min(scrollDistance, phase * FORWARD_SCROLL_SPEED_PX_PER_MS);
+      } else if (phase < holdEndLimit) {
+        offset = -scrollDistance;
+      } else if (phase < holdStartLimit) {
+        offset = 0;
+      } else {
+        offset = 0;
+      }
+
+      text.style.transform = `translateX(${offset}px)`;
+      frameRef.current = requestAnimationFrame(tick);
+    };
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      startRef.current = 0;
+    };
+  }, [timings, hovered, scrollDistance]);
+
   return (
-    <strong
+    <Tag
       ref={containerRef}
-      className={scrollDistance > 0 ? 'auto-title is-overflowing' : 'auto-title'}
-      style={{ '--scroll-distance': `${scrollDistance}px` }}
+      className={`${className} hover-scroll ${scrollDistance > 0 ? 'is-overflowing' : ''}`.trim()}
     >
       <span ref={textRef}>{children}</span>
-    </strong>
+    </Tag>
+  );
+}
+
+// 曲タイトルと説明を表示
+function SelectionSongText({ title, description, showDescription, hovered = false }) {
+  const [titleDistance, setTitleDistance] = React.useState(0);
+  const [descriptionDistance, setDescriptionDistance] = React.useState(0);
+  const hasDescription = showDescription && Boolean(description);
+
+  const timings = React.useMemo(() => {
+    const maxDistance = Math.max(titleDistance, hasDescription ? descriptionDistance : 0);
+    if (maxDistance <= 0) return null;
+
+    const forwardDuration = maxDistance / FORWARD_SCROLL_SPEED_PX_PER_MS;
+    return {
+      forwardDuration,
+      cycleDuration: forwardDuration + HOLD_AT_END_MS + HOLD_AT_START_MS,
+    };
+  }, [descriptionDistance, hasDescription, titleDistance]);
+
+  return (
+    <span className="song-row-text">
+      <HoverScrollText hovered={hovered} timings={timings} onMeasure={setTitleDistance}>
+        {title}
+      </HoverScrollText>
+      {hasDescription ? (
+        <HoverScrollText
+          as="small"
+          className="song-description"
+          hovered={hovered}
+          timings={timings}
+          onMeasure={setDescriptionDistance}
+        >
+          {description}
+        </HoverScrollText>
+      ) : null}
+    </span>
+  );
+}
+
+// 曲選択用の行
+function SelectionSongRow({ song, language, showDescriptions, selected, onToggle }) {
+  const [hovered, setHovered] = React.useState(false);
+
+  return (
+    <label className="song-row" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <input type="checkbox" checked={selected} onChange={() => onToggle(song.id)} />
+      <SelectionSongText title={getLocalizedText(song.title, language)} description={song.description} showDescription={showDescriptions} hovered={hovered} />
+    </label>
   );
 }
 
@@ -235,6 +346,7 @@ function App() {
   const [mode, setMode] = React.useState('select');
   const [darkMode, setDarkMode] = React.useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false);
   const [language, setLanguage] = React.useState('en');
+  const [showDescriptions, setShowDescriptions] = React.useState(true);
   React.useEffect(() => {
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
   }, [darkMode]);
@@ -329,8 +441,16 @@ function App() {
         </div>
         <div className="header-actions">
           <LanguageToggle language={language} setLanguage={setLanguage} />
+          <button
+            className="icon-button"
+            onClick={() => setShowDescriptions((value) => !value)}
+            aria-label={showDescriptions ? '詳細表示をオフにする' : '詳細表示をオンにする'}
+            aria-pressed={showDescriptions}
+          >
+            {showDescriptions ? <Eye size={21} /> : <EyeOff size={21} />}
+          </button>
           <button className="icon-button" onClick={() => setDarkMode((value) => !value)} aria-label={darkMode ? 'ライトモードに切替' : 'ダークモードに切替'}>
-            {darkMode ? <Sun size={21} /> : <Moon size={21} />}
+            {darkMode ? <Moon size={21} /> : <Sun size={21} />}
           </button>
           <div className="header-count">
             <ListChecks size={20} />
@@ -385,12 +505,14 @@ function App() {
                   </label>
                   <div className="chapter-songs">
                     {chapterSongs.map((song) => (
-                      <label key={song.id} className="song-row">
-                        <input type="checkbox" checked={selectedIds.has(song.id)} onChange={() => toggleSong(song.id)} />
-                        <span>
-                          <AutoScrollTitle>{getLocalizedText(song.title, language)}</AutoScrollTitle>
-                        </span>
-                      </label>
+                      <SelectionSongRow
+                        key={song.id}
+                        song={song}
+                        language={language}
+                        showDescriptions={showDescriptions}
+                        selected={selectedIds.has(song.id)}
+                        onToggle={toggleSong}
+                      />
                     ))}
                   </div>
                 </section>
@@ -419,6 +541,7 @@ function App() {
           <div className="battle-grid">
             <article className="choice-card">
               <h3>{getLocalizedText(battle.left.title, language)}</h3>
+              {showDescriptions && battle.left.description ? <p className="song-description choice-description">{battle.left.description}</p> : null}
               <div className="choice-bottom">
                 <SongMedia song={battle.left} darkMode={darkMode} />
                 <button onClick={() => choose('left')}>
@@ -429,6 +552,7 @@ function App() {
             </article>
             <article className="choice-card">
               <h3>{getLocalizedText(battle.right.title, language)}</h3>
+              {showDescriptions && battle.right.description ? <p className="song-description choice-description">{battle.right.description}</p> : null}
               <div className="choice-bottom">
                 <SongMedia song={battle.right} darkMode={darkMode} />
                 <button onClick={() => choose('right')}>
@@ -463,7 +587,7 @@ function App() {
                   <span className="rank">{index + 1}</span>
                   <div>
                     <strong>{getLocalizedText(song.title, language)}</strong>
-                    <small>{song.chapter}</small>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}
@@ -474,7 +598,7 @@ function App() {
                   <span className="rank">{offset + 3}</span>
                   <div>
                     <strong>{getLocalizedText(song.title, language)}</strong>
-                    <small>{song.chapter}</small>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}
@@ -485,7 +609,7 @@ function App() {
                   <span className="rank">{offset + 11}</span>
                   <div>
                     <strong>{getLocalizedText(song.title, language)}</strong>
-                    <small>{song.chapter}</small>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}

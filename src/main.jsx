@@ -4,8 +4,9 @@ import { Check, ChevronLeft, Headphones, ListChecks, Moon, Play, RotateCcw, Sear
 import packageJson from '../package.json';
 import './styles.css';
 
-const modules = import.meta.glob('../json/**/*.json', { eager: true });
+const modules = import.meta.glob('./assets/json/**/*.json', { eager: true });
 
+// JSONデータから指定されたキーの値を取得
 function pick(source, keys, fallback = '') {
   for (const key of keys) {
     if (source?.[key] !== undefined && source[key] !== null && source[key] !== '') {
@@ -15,7 +16,8 @@ function pick(source, keys, fallback = '') {
   return fallback;
 }
 
-function flattenJson(value, fileLabel) {
+// JSONデータをフラット化して曲リストを生成
+function flattenJson(value) {
   if (Array.isArray(value)) return value;
   if (Array.isArray(value?.songs)) return value.songs;
   if (Array.isArray(value?.tracks)) return value.tracks;
@@ -29,6 +31,7 @@ function flattenJson(value, fileLabel) {
   return [];
 }
 
+// Spotifyの埋め込みURLを生成
 function spotifyEmbedUrl(urlOrId, theme = 0) {
   if (!urlOrId) return '';
   const text = String(urlOrId);
@@ -37,6 +40,7 @@ function spotifyEmbedUrl(urlOrId, theme = 0) {
   return id ? `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=${theme}` : '';
 }
 
+// 多言語対応のテキストを正規化
 function normalizeLocalizedText(value, fallback = '') {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     return {
@@ -49,6 +53,7 @@ function normalizeLocalizedText(value, fallback = '') {
   return { en: text, ja: text };
 }
 
+// 曲タイトルを解決する
 function resolveSongTitle(raw, fallback) {
   if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
     if ('en' in raw || 'ja' in raw) {
@@ -62,6 +67,7 @@ function resolveSongTitle(raw, fallback) {
   return normalizeLocalizedText(raw, fallback);
 }
 
+// 多言語対応のテキストを取得
 function getLocalizedText(value, language) {
   if (!value) return '';
   if (typeof value === 'string') return value;
@@ -69,7 +75,7 @@ function getLocalizedText(value, language) {
 }
 
 const songs = Object.entries(modules).flatMap(([path, module]) => {
-  const fileLabel = path.replace('../json/', '').replace(/\.json$/i, '');
+  const fileLabel = path.replace('./assets/json/', '').replace(/\.json$/i, '');
   return flattenJson(module.default, fileLabel).map((raw, index) => {
     const fallbackTitle = `Untitled ${index + 1}`;
     const title = resolveSongTitle(raw, fallbackTitle);
@@ -85,12 +91,11 @@ const songs = Object.entries(modules).flatMap(([path, module]) => {
       chapter: String(chapter || fileLabel),
       previewUrl: String(previewUrl || ''),
       spotifyUrl: String(spotifyUrl || ''),
-      spotifyId: spotifyEmbedUrl(spotifyUrl) ? String(spotifyUrl) : '',
-      raw,
     };
   });
 });
 
+// ヒープソート
 function* heapTopGenerator(inputItems, limit) {
   const heap = [...inputItems];
   const compare = function* (a, b) {
@@ -127,6 +132,7 @@ function* heapTopGenerator(inputItems, limit) {
   return ranking;
 }
 
+// 入力曲と回答履歴からソート状態を復元
 function resolveSortState(inputSongs, limit, answers) {
   const generator = heapTopGenerator(inputSongs, Math.min(limit, inputSongs.length));
   let ranking = [];
@@ -145,17 +151,7 @@ function resolveSortState(inputSongs, limit, answers) {
   return { battle: next.value, ranking, done: false };
 }
 
-function SongPreview({ song, compact = false, darkMode = false }) {
-  return (
-    <div className={compact ? 'song-preview compact' : 'song-preview'}>
-      <div>
-        <h3>{getLocalizedText(song.title, 'en')}</h3>
-      </div>
-      <SongMedia song={song} compact={compact} darkMode={darkMode} />
-    </div>
-  );
-}
-
+// 曲のプレビューを表示
 function SongMedia({ song, compact = false, darkMode = false }) {
   const embedUrl = spotifyEmbedUrl(song.spotifyUrl, darkMode ? 1 : 0);
 
@@ -182,6 +178,7 @@ function SongMedia({ song, compact = false, darkMode = false }) {
   );
 }
 
+// タイトルが見切れる場合に自動でスクロール
 function AutoScrollTitle({ children }) {
   const containerRef = React.useRef(null);
   const textRef = React.useRef(null);
@@ -213,6 +210,7 @@ function AutoScrollTitle({ children }) {
   );
 }
 
+// 表示言語切替ボタン
 function LanguageToggle({ language, setLanguage }) {
   return (
     <div className="language-switch" role="group" aria-label="表示言語">
@@ -256,6 +254,7 @@ function App() {
     [chapters, filteredSongs],
   );
 
+  // 曲選択を切替
   function toggleSong(id) {
     setSelectedIds((current) => {
       const next = new Set(current);
@@ -264,6 +263,7 @@ function App() {
     });
   }
 
+  // チャプター単位で曲選択を切替
   function setChapter(chapter, checked) {
     setSelectedIds((current) => {
       const next = new Set(current);
@@ -274,6 +274,7 @@ function App() {
     });
   }
 
+  // ソート開始
   function startSort() {
     const state = resolveSortState(selectedSongs, limit, []);
     setAnswers([]);
@@ -282,6 +283,7 @@ function App() {
     setMode('sort');
   }
 
+  // 選択肢を選ぶ
   function choose(side) {
     const nextAnswers = [...answers, side];
     const state = resolveSortState(selectedSongs, limit, nextAnswers);
@@ -291,6 +293,7 @@ function App() {
     setMode(state.done ? 'result' : 'sort');
   }
 
+  // 一つ戻る
   function undoChoice() {
     const nextAnswers = answers.slice(0, -1);
     const state = resolveSortState(selectedSongs, limit, nextAnswers);
@@ -300,6 +303,7 @@ function App() {
     setMode('sort');
   }
 
+  // 初期画面に戻る
   function reset() {
     setBattle(null);
     setRanking([]);
@@ -335,6 +339,7 @@ function App() {
         </div>
       </header>
 
+      {/* 選択画面 */}
       {mode === 'select' && (
         <section className="workspace">
           <section className="panel song-list-panel">
@@ -395,6 +400,7 @@ function App() {
         </section>
       )}
 
+      {/* ソート画面 */}
       {mode === 'sort' && battle && (
         <section className="sort-screen">
           <div className="sort-topbar">
@@ -435,12 +441,13 @@ function App() {
         </section>
       )}
 
+      {/* 結果表示 */}
       {mode === 'result' && (
         <section className="result-screen">
           <div className="result-header">
             <div>
               <p>{answers.length} 回の比較で決定</p>
-              <h2>ランキング</h2>
+              <h2>ソート結果</h2>
             </div>
             <div className="result-actions">
               <button className="start-button secondary" onClick={reset}>

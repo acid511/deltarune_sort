@@ -37,17 +37,50 @@ function spotifyEmbedUrl(urlOrId, theme = 0) {
   return id ? `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=${theme}` : '';
 }
 
+function normalizeLocalizedText(value, fallback = '') {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return {
+      en: String(pick(value, ['en', 'english', 'English'], fallback)),
+      ja: String(pick(value, ['ja', 'jp', 'japanese', 'Japanese'], fallback)),
+    };
+  }
+
+  const text = String(value || fallback);
+  return { en: text, ja: text };
+}
+
+function resolveSongTitle(raw, fallback) {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    if ('en' in raw || 'ja' in raw) {
+      return normalizeLocalizedText(raw, fallback);
+    }
+
+    const titleValue = pick(raw, ['title', 'name', 'song', 'trackName', 'track_name', '曲名'], null);
+    return normalizeLocalizedText(titleValue ?? fallback, fallback);
+  }
+
+  return normalizeLocalizedText(raw, fallback);
+}
+
+function getLocalizedText(value, language) {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return String(value?.[language] || value?.en || value?.ja || '');
+}
+
 const songs = Object.entries(modules).flatMap(([path, module]) => {
   const fileLabel = path.replace('../json/', '').replace(/\.json$/i, '');
   return flattenJson(module.default, fileLabel).map((raw, index) => {
-    const title = pick(raw, ['title', 'name', 'song', 'trackName', 'track_name', '曲名'], `Untitled ${index + 1}`);
+    const fallbackTitle = `Untitled ${index + 1}`;
+    const title = resolveSongTitle(raw, fallbackTitle);
+    const titleLabel = title.en || title.ja || fallbackTitle;
     const artist = pick(raw, ['artist', 'artists', 'singer', 'vocal', 'artistName', 'artist_name', 'アーティスト']);
     const chapter = pick(raw, ['chapter', 'category', 'album', 'group', 'section', 'チャプター'], fileLabel);
     const previewUrl = pick(raw, ['preview_url', 'previewUrl', 'preview', 'audio', 'audioUrl', 'audio_url']);
     const spotifyUrl = pick(raw, ['spotify_url', 'spotifyUrl', 'spotify', 'external_url', 'externalUrl', 'url']);
     return {
-      id: pick(raw, ['id', 'track_id', 'trackId'], `${fileLabel}-${index}-${title}`),
-      title: String(title),
+      id: pick(raw, ['id', 'track_id', 'trackId'], `${fileLabel}-${index}-${titleLabel}`),
+      title,
       artist: Array.isArray(artist) ? artist.join(', ') : String(artist || ''),
       chapter: String(chapter || fileLabel),
       previewUrl: String(previewUrl || ''),
@@ -116,7 +149,7 @@ function SongPreview({ song, compact = false, darkMode = false }) {
   return (
     <div className={compact ? 'song-preview compact' : 'song-preview'}>
       <div>
-        <h3>{song.title}</h3>
+        <h3>{getLocalizedText(song.title, 'en')}</h3>
       </div>
       <SongMedia song={song} compact={compact} darkMode={darkMode} />
     </div>
@@ -132,7 +165,7 @@ function SongMedia({ song, compact = false, darkMode = false }) {
         <audio controls src={song.previewUrl} preload="none" />
       ) : embedUrl ? (
         <iframe
-          title={`${song.title} Spotify preview`}
+          title={`${getLocalizedText(song.title, 'en')} Spotify preview`}
           src={embedUrl}
           width="100%"
           height={compact ? '80' : '152'}
@@ -180,6 +213,19 @@ function AutoScrollTitle({ children }) {
   );
 }
 
+function LanguageToggle({ language, setLanguage }) {
+  return (
+    <div className="language-switch" role="group" aria-label="表示言語">
+      <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')} aria-pressed={language === 'en'}>
+        EN
+      </button>
+      <button className={language === 'ja' ? 'active' : ''} onClick={() => setLanguage('ja')} aria-pressed={language === 'ja'}>
+        日本語
+      </button>
+    </div>
+  );
+}
+
 function App() {
   const chapters = React.useMemo(() => [...new Set(songs.map((song) => song.chapter))].sort(), []);
   const [selectedIds, setSelectedIds] = React.useState(() => new Set(songs.map((song) => song.id)));
@@ -190,6 +236,7 @@ function App() {
   const [answers, setAnswers] = React.useState([]);
   const [mode, setMode] = React.useState('select');
   const [darkMode, setDarkMode] = React.useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false);
+  const [language, setLanguage] = React.useState('en');
   React.useEffect(() => {
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
   }, [darkMode]);
@@ -198,7 +245,7 @@ function App() {
   const filteredSongs = React.useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return songs;
-    return songs.filter((song) => [song.title, song.chapter].join(' ').toLowerCase().includes(needle));
+    return songs.filter((song) => [getLocalizedText(song.title, 'en'), getLocalizedText(song.title, 'ja'), song.chapter].join(' ').toLowerCase().includes(needle));
   }, [query]);
   const songsByChapter = React.useMemo(
     () =>
@@ -273,10 +320,11 @@ function App() {
     <main>
       <header className="app-header">
         <div>
-          <p>version {packageJson.version}</p>
+          <p>ver {packageJson.version}</p>
           <h1>DELTARUNE 曲ソート</h1>
         </div>
         <div className="header-actions">
+          <LanguageToggle language={language} setLanguage={setLanguage} />
           <button className="icon-button" onClick={() => setDarkMode((value) => !value)} aria-label={darkMode ? 'ライトモードに切替' : 'ダークモードに切替'}>
             {darkMode ? <Sun size={21} /> : <Moon size={21} />}
           </button>
@@ -335,7 +383,7 @@ function App() {
                       <label key={song.id} className="song-row">
                         <input type="checkbox" checked={selectedIds.has(song.id)} onChange={() => toggleSong(song.id)} />
                         <span>
-                          <AutoScrollTitle>{song.title}</AutoScrollTitle>
+                          <AutoScrollTitle>{getLocalizedText(song.title, language)}</AutoScrollTitle>
                         </span>
                       </label>
                     ))}
@@ -364,7 +412,7 @@ function App() {
           </div>
           <div className="battle-grid">
             <article className="choice-card">
-              <h3>{battle.left.title}</h3>
+              <h3>{getLocalizedText(battle.left.title, language)}</h3>
               <div className="choice-bottom">
                 <SongMedia song={battle.left} darkMode={darkMode} />
                 <button onClick={() => choose('left')}>
@@ -374,7 +422,7 @@ function App() {
               </div>
             </article>
             <article className="choice-card">
-              <h3>{battle.right.title}</h3>
+              <h3>{getLocalizedText(battle.right.title, language)}</h3>
               <div className="choice-bottom">
                 <SongMedia song={battle.right} darkMode={darkMode} />
                 <button onClick={() => choose('right')}>
@@ -407,7 +455,7 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{index + 1}</span>
                   <div>
-                    <strong>{song.title}</strong>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
                     <small>{song.chapter}</small>
                   </div>
                 </li>
@@ -418,7 +466,7 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{offset + 3}</span>
                   <div>
-                    <strong>{song.title}</strong>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
                     <small>{song.chapter}</small>
                   </div>
                 </li>
@@ -429,7 +477,7 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{offset + 11}</span>
                   <div>
-                    <strong>{song.title}</strong>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
                     <small>{song.chapter}</small>
                   </div>
                 </li>

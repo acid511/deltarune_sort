@@ -2,236 +2,283 @@
   {
     "en": "Faint Grow",
     "ja": "ほのかな光",
+    "description": "ファイルセレクト(クリア前)",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0xivcj5to8yZK784YzBUHQ"
   },
   {
     "en": "Girl Next Door",
     "ja": "となりのあのコ",
+    "description": "ノエルのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6rTBgu60ZRggjY3Zt0LfCo"
   },
   {
     "en": "My Castle Town",
     "ja": "マイ キャッスルタウン",
+    "description": "城下町",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3n2rzXga1RdenWKPi3fxpW"
   },
   {
     "en": "Ohhhhohohoho!",
     "ja": "オーッホホホホ！",
+    "description": "クイーンの笑い声",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6o1Mxh0E9Pa6mH9cR04rhm"
   },
   {
     "en": "Queen",
     "ja": "クイーン",
+    "description": "クイーンのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6ZS6otuyHdltdBDEnFxcIr"
   },
   {
     "en": "A CYBER'S WORLD?",
     "ja": "CYBER WORLD",
+    "description": "サイバーワールド フィールド(前半)",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5GFf1Vqo8vlb6IUJVmNN9v"
   },
   {
     "en": "A Simple Diversion",
     "ja": "子どもだましのツール",
+    "description": "クイーンとのゲームイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5H60Jh1NfhnImYNZaVogmV"
   },
   {
     "en": "Almost to the Guys!",
     "ja": "ヤツらに会える！",
+    "description": "スイート·キャップ·ケーキ戦前の弾幕イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3lZLoWw0KBJuiskaNq14it"
   },
   {
     "en": "Cool Beat",
     "ja": "クールなビート",
+    "description": "スイート·キャップ·ケーキ戦前の会話イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0AzPAeFT1DmLa2AdTnNtNy"
   },
   {
     "en": "When I Get Mad I Dance Like This",
     "ja": "アングリー ダンスバトル",
+    "description": "スイート·キャップ·ケーキ戦前の会話イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5WMcJm5MnDeJAQOfIZ3zA4"
   },
   {
     "en": "Cyber Battle (Solo)",
     "ja": "サイバーバトル（ソロ）",
+    "description": "スイート·キャップ·ケーキ戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6ndbtEeYH2uIn7NmVMXb2t"
   },
   {
     "en": "When I Get Happy I Dance Like This",
     "ja": "ハッピー ダンスバトル",
+    "description": "スイート·キャップ·ケーキ戦後の和解イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/77gYaZJus6LBv8ElRxaps6"
   },
   {
     "en": "Sound Studio",
     "ja": "サウンドスタジオ",
+    "description": "スイート·キャップ·ケーキのショップ、サウンドルーム",
     "spotify_url": "https://open.spotify.com/intl-ja/track/67oz3QiRJ8JeT92Dri5TcH"
   },
   {
     "en": "Berdly",
     "ja": "バードリー",
+    "description": "バードリーのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3wcuKqQIrz86jiRIRL4jSm"
   },
   {
     "en": "Smart Race",
     "ja": "IQチキンレース",
+    "description": "バードリー戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/1MbtwdXOJVSUEnJE0ZPWVH"
   },
   {
     "en": "Faint Courage (Game Over)",
     "ja": "ほらかな勇気（ゲームオーバー）",
+    "description": "ゲームオーバー",
     "spotify_url": "https://open.spotify.com/intl-ja/track/70AgbjKVDxWhSakPy6jiZy"
   },
   {
     "en": "WELCOME TO THE CITY",
     "ja": "WELCOME TO THE CITY",
+    "description": "サイバーワールド フィールド(後半)",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4PRycGPUzQjbmCb6VuqFn3"
   },
   {
     "en": "Mini Studio",
     "ja": "ミニスタジオ",
+    "description": "スイート·キャップ·ケーキのポップアップショップ",
     "spotify_url": "https://opja.spotify.com/intl-ja/track/46pVQuDueQbVAgfcvkcn5h"
   },
   {
     "en": "Holiday Studio",
     "ja": "ホリデースタジオ",
+    "description": "サウンドルーム 5番",
     "spotify_url": "https://opja.spotify.com/intl-ja/track/6KgztXt4UvVN4fDc2qFTdn"
   },
   {
     "en": "Cool Mixtape",
     "ja": "イカしたミックステープ",
+    "description": "車の運転イベント | ch4:クイーンの部屋（城下町）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3CYDvj5Jj1uLXJZ1fnHR3k"
   },
   {
     "en": "HEY EVERY !",
     "ja": "はい みなさn！",
+    "description": "スパムトンとの遭遇",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7GCHoulGzYLG9aC3LW9WOg"
   },
   {
     "en": "Spamton",
     "ja": "スパムトン",
+    "description": "スパムトンのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0aXW6iktkKEtBLGxqotuhJ"
   },
   {
     "en": "NOW'S YOUR CHANCE TO BE A",
     "ja": "いまがﾁｬｿｽ！",
+    "description": "スパムトン戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6qgTKrPAIuVblbylr7oe4n"
   },
   {
     "en": "Elegant Entrance",
     "ja": "豪奢な館",
+    "description": "クイーンの館 - 客間〜玄関ホール",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5nZQ7E80VVofgUFpL55Cda"
   },
   {
     "en": "Bluebird of Misfortune",
     "ja": "不幸せの青いトリ",
+    "description": "バードリーの回想イベント",
     "spotify_url": "https://opja.spotify.com/intl-ja/track/0HYY5ueGXToa8yBfa6Rpg4"
   },
   {
     "en": "Pandora Palace",
     "ja": "パンドラパレス",
+    "description": "クイーンの館",
     "spotify_url": "https://open.spotify.com/intl-ja/track/09iucmwOPlzwRTpBIRJ5P9"
   },
   {
     "en": "KEYGEN",
     "ja": "キー生成キ",
+    "description": "スパムトンの店でのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/1Aqu3d5dEozUy57aZSBfAU"
   },
   {
     "en": "Acid Tunnel of Love",
     "ja": "愛の酸液川トンネル",
+    "description": "酸液川のトンネル",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5asZ6mI4gcw3tTG3wAsMve"
   },
   {
     "en": "It's Pronounced \"Rules\"",
     "ja": "ルールノー・ルール",
+    "description": "ルールノー・カァドー戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0IRcPuQ2FENI9mlpLfMzbF"
   },
   {
     "en": "Lost Girl",
     "ja": "Lost Girl",
+    "description": "ノエルのイベント 他",
     "spotify_url": "https://open.spotify.com/intl-ja/track/16Y0X5SXkXPc8vlNRrQKcj"
   },
   {
     "en": "Ferris Wheel",
     "ja": "観覧車に乗って",
+    "description": "観覧車イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5wSHNGdlAEVq1jzhvTCLGN"
   },
   {
     "en": "Attack of the Killer Queen",
     "ja": "進撃のキラークイーン",
+    "description": "クイーン戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6V53UDIOvJ8QNjRAQmvQQn"
   },
   {
     "en": "Giga Size",
     "ja": "GIGA Size",
+    "description": "ギガクイーン登場イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/109i1Y3wADywLepriBRBMG"
   },
   {
     "en": "Powers Combined",
     "ja": "パワー合体！",
+    "description": "仲間の援助イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5gUYzkYXdNPFC43EcVtgwa"
   },
   {
     "en": "Knock You Down !!",
     "ja": "Knock You Down !!",
+    "description": "ギガクイーン戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/49d5yPtvBMIrLogFEZbRFK"
   },
   {
     "en": "The Dark Truth",
     "ja": "闇の真実",
+    "description": "闇の泉の真実",
     "spotify_url": "https://open.spotify.com/intl-ja/track/08bez1mbnnWBByO07ACOTK"
   },
   {
     "en": "Digital Roots",
     "ja": "デジタルルーツ",
+    "description": "館の地下室",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4RjBQh1mx6DNVkuoAHwwd4"
   },
   {
     "en": "Deal Gone Wrong",
     "ja": "商談決裂",
+    "description": "スパムトンとの対峙",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7tpkla1xi73LkARWPM3W7C"
   },
   {
     "en": "BIG SHOT",
     "ja": "[[BIG]]の力",
+    "description": "スパムトンNEO戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/75LoeZ6ZlqU1ZBeQAf9PAV"
   },
   {
     "en": "A Real Boy!",
     "ja": "ホンモノの男の子",
+    "description": "スパムトンNEO戦後のイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0FFfp8DKIf8Kcsg2aJrQRd"
   },
   {
     "en": "Dialtone",
     "ja": "黒電話",
+    "description": "スパムトンNEO戦後の会話イベント,スパムトンの店",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3qcRtvkyuj4oFsnnwjEIvm"
   },
   {
     "en": "sans.",
     "ja": "サンズ",
+    "description": "サンズ会話曲",
     "spotify_url": "https://open.spotify.com/intl-ja/track/53u2KlxppndMnh2gbABdlK"
   },
   {
     "en": "Chill Jailbreak Alarm to Study and Relax to",
     "ja": "ききながら べんきょうしたり マッタリしたりするのに ピッタリな だつごく けいほう",
+    "description": "けいさつしょのけいほう",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5RTDaErpkkcSUnENIeTWql"
   },
   {
     "en": "You Can Always Come Home",
     "ja": "いつでも帰れる場所",
+    "description": "クリスの家",
     "spotify_url": "https://open.spotify.com/intl-ja/track/67TrS1dTnan36Px2bT4Sv1"
   },
   {
     "en": "Until Next Time",
     "ja": "また会うときまで",
+    "description": "エンディング",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4W4i3Venw1E5L0nrlNUioQ"
   },
   {
     "en": "Before the Story",
     "ja": "はじまりの前",
+    "description": "ファイルセレクト(クリア後)",
     "spotify_url": "https://open.spotify.com/intl-ja/track/1E5SjahmKpFAEBne6EysNY"
   },
   {
     "en": "Berdly (Rejected Concept)",
     "ja": "バードリー（没バージョン）",
+    "description": "BGM「Berdly」の別バージョン",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5HsGFvnQvY4U7uiuPNf29T"
   }
 ]

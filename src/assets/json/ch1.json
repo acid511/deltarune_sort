@@ -2,201 +2,241 @@
   {
     "en": "ANOTHER HIM",
     "ja": "もうひとりの彼",
+    "description": "キャラメイク",
     "spotify_url": "https://open.spotify.com/intl-ja/track/2kfvXYWEF2wo1DpGi3hqSr"
   },
   {
     "en": "Beginning",
     "ja": "BEGINNING",
+    "description": "オープニングイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/27GzAkfkGaRyf5pi0xvrsq"
   },
   {
     "en": "School",
     "ja": "学校",
+    "description": "授業中の教室",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4M3E6ga5GGOwgxrXRgxbHa"
   },
   {
     "en": "Susie",
     "ja": "スージィ",
+    "description": "スージィのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6KvrKAiaCybCV0KsNjAzK6"
   },
   {
     "en": "The Door",
     "ja": "とびら",
+    "description": "闇の世界への入口",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5GnuJuDhlFTuSWv9CEavx8"
   },
   {
     "en": "Cliffs",
     "ja": "絶壁",
+    "description": "絶壁、大盤面",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6tmgLsovnA9Z1OzRi3jBHQ"
   },
   {
     "en": "The Chase",
     "ja": "追跡",
+    "description": "追跡イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4U2vITu5Eq3FBuf60lfDp4"
   },
   {
     "en": "The Legend",
     "ja": "伝説",
+    "description": "DELTARUNEの伝説 | ch1~3: オープニングデモ（クリア後）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0sLOBeCwY7NUElgF0W55uF"
   },
   {
     "en": "Lancer",
     "ja": "ボクさま、ランサー！",
+    "description": "ランサーのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0sQa1ocJO50OURJ1eqBPEa"
   },
   {
     "en": "Rude Buster",
     "ja": "ルードバスター",
+    "description": "通常戦闘 | ch4: ラニーノ&エルニーナ戦（道場）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5hYL5ot1DFjkV8hUuFuYDK"
   },
   {
     "en": "Empty Town",
     "ja": "誰もいない町",
+    "description": "城下町（初期）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/2PZvj5KpJSG1T8PTzzqBIs"
   },
   {
     "en": "Weird Birds",
     "ja": "不思議な鳥たち",
+    "description": "平原入口",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5siou7PPOs9hr11Nmje7xe"
   },
   {
     "en": "Field of Hopes and Dreams",
     "ja": "夢と希望の平原",
+    "description": "夢と希望の平原",
     "spotify_url": "https://open.spotify.com/intl-ja/track/2ONZCxNQdDP4jabteTBJB2"
   },
   {
     "en": "Fanfare (from Rose of Winter)",
     "ja": "ファンファーレ （『Rose of Winter』より）",
+    "description": "スージィが仲間に加わった | ch4: まほうのアックスを手に入れた （出典: ゲーム『Rose of Winter』より）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7gv8ouwNTIvGFATeOx0vOu"
   },
   {
     "en": "Lantern",
     "ja": "灯火",
+    "description": "よろず屋",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5baiLRN7B6EqiKE7GkdfPI"
   },
   {
     "en": "I'm Very Bad",
     "ja": "ボクさま、悪モノ！",
+    "description": "ランサーのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3sjgbdj6JBkZYDB55Ax9Hy"
   },
   {
     "en": "Checker Dance",
     "ja": "チェッカーダンス",
+    "description": "K.ラウンド戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4zYFrzwCEaQuTdIEEXY2lv"
   },
   {
     "en": "Quiet Autumn",
     "ja": "やすらぎの秋",
+    "description": "森入口・スイーツ即売会",
     "spotify_url": "https://open.spotify.com/intl-ja/track/615fio6BdDeRCHc3zhd2G4"
   },
   {
     "en": "Scarlet Forest",
     "ja": "紅の森",
+    "description": "森",
     "spotify_url": "https://open.spotify.com/intl-ja/track/2k2nadnJXduE3w8y9AlHDG"
   },
   {
     "en": "Thrash Machine",
     "ja": "ボコリングマシン",
+    "description": "マシン組み立てゲーム",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3AhgtkmSOkvs1WjR0Y9yFn"
   },
   {
     "en": "Vs. Lancer",
     "ja": "ランサー戦",
+    "description": "ランサー＆スージィ戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5o5gCvo929tmz5Gmf1LG0H"
   },
   {
     "en": "Basement",
     "ja": "地下牢",
+    "description": "地下牢",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6XoZrs7z9JPsOYL7GuAxoi"
   },
   {
     "en": "Imminent Death",
     "ja": "死の警報",
+    "description": "スージィの憤怒イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6eJyf0yM2bGs7PFYH2nbCr"
   },
   {
     "en": "Vs. Susie",
     "ja": "スージィ戦",
+    "description": "スージィ vs ランサー",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5Lp7ysRscFbgthErTo0Lqg"
   },
   {
     "en": "Card Castle",
     "ja": "カルタス城",
+    "description": "カルタス城",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0TTrXobKilUUrhyujVLkCA"
   },
   {
     "en": "Rouxls Kaard",
     "ja": "ルールノー・カァドー",
+    "description": "ルールノーのイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7MjG9FwxbXwvy9fUNXZMrS"
   },
   {
     "en": "April 2012",
     "ja": "April 2012",
+    "description": "パーティルーム",
     "spotify_url": "https://open.spotify.com/intl-ja/track/26oiJ4gVT7nwXw3VuYayKn"
   },
   {
     "en": "Hip Shop",
     "ja": "プリティショップ",
+    "description": "ルールノーの店 | ch2: パレッタの店（クイーンの館）",
     "spotify_url": "https://open.spotify.com/intl-ja/track/3NQxxBMXPZnKd2AOkfuqOo"
   },
   {
     "en": "Gallery",
     "ja": "ギャラリー",
+    "description": "キング戦前・キング戦後イベント | ch2: クイーン戦前 | ch4: ラストバトル前イベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/0BtzTqUV2yuRAEAY4AO7Rw"
   },
   {
     "en": "Chaos King",
     "ja": "カオスの王",
+    "description": "キング戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6RVM8dnn93rN7CsQRLA9Nl"
   },
   {
     "en": "Darkness Falls",
     "ja": "闇の降るとき",
+    "description": "ゲームオーバー",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7HOaEjdFDggBT7NuxXZR2U"
   },
   {
     "en": "The Circus",
     "ja": "サーカス",
+    "description": "ジェビルの監獄",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4yeT1CKQXY1hWdkT09QqP9"
   },
   {
     "en": "THE WORLD REVOLVING",
     "ja": "THE WORLD REVOLVING",
+    "description": "ジェビル戦",
     "spotify_url": "https://open.spotify.com/intl-ja/track/1o0I5gNnuTDZkcLfWSaLqn"
   },
   {
     "en": "Friendship",
     "ja": "みんな友だち",
+    "description": "別れの挨拶",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4OnhN8YIGmE5WDkBkaJvN6"
   },
   {
     "en": "THE HOLY",
     "ja": "THE HOLY",
+    "description": "泉のイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4CiDvPmY1TmSIcTsr36Sh0"
   },
   {
     "en": "Your Power",
     "ja": "キミの力",
+    "description": "泉のイベント",
     "spotify_url": "https://open.spotify.com/intl-ja/track/4P1i1JjgmdxkYuQm6bC9qz"
   },
   {
     "en": "A Town Called Hometown",
     "ja": "「ホームタウン」という名の町",
+    "description": "光の世界の町",
     "spotify_url": "https://open.spotify.com/intl-ja/track/7s2VAyHWzlvJdbSVHE7fqF"
   },
   {
     "en": "You Can Always Come Home",
     "ja": "いつでも帰れる場所",
+    "description": "クリスの家",
     "spotify_url": "https://open.spotify.com/intl-ja/track/5pKV9HeNq1xttN4h2DE6DW"
   },
   {
     "en": "Laura Shigihara - Don't Forget",
     "ja": "Don't Forget",
+    "description": "エンディング",
     "spotify_url": "https://open.spotify.com/intl-ja/track/6sHTaxO3jeoRDSUWYteOcN"
   },
   {
     "en": "Before the Story",
     "ja": "はじまりの前",
+    "description": "ファイルセレクト(クリア後)",
     "spotify_url": "https://open.spotify.com/intl-ja/track/66JAdRcdWxYjZ7n82xoo9M"
   }
 ]

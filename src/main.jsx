@@ -1,11 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Check, ChevronLeft, Headphones, ListChecks, Moon, Play, RotateCcw, Search, Sun, Undo2 } from 'lucide-react';
+import { Check, ChevronLeft, Eye, EyeOff, Headphones, ListChecks, Moon, Play, RotateCcw, Search, Sun, Undo2 } from 'lucide-react';
 import packageJson from '../package.json';
 import './styles.css';
 
-const modules = import.meta.glob('../json/**/*.json', { eager: true });
+const modules = import.meta.glob('./assets/json/**/*.json', { eager: true });
 
+// JSONデータから指定されたキーの値を取得
 function pick(source, keys, fallback = '') {
   for (const key of keys) {
     if (source?.[key] !== undefined && source[key] !== null && source[key] !== '') {
@@ -15,7 +16,8 @@ function pick(source, keys, fallback = '') {
   return fallback;
 }
 
-function flattenJson(value, fileLabel) {
+// JSONデータをフラット化して曲リストを生成
+function flattenJson(value) {
   if (Array.isArray(value)) return value;
   if (Array.isArray(value?.songs)) return value.songs;
   if (Array.isArray(value?.tracks)) return value.tracks;
@@ -29,6 +31,7 @@ function flattenJson(value, fileLabel) {
   return [];
 }
 
+// Spotifyの埋め込みURLを生成
 function spotifyEmbedUrl(urlOrId, theme = 0) {
   if (!urlOrId) return '';
   const text = String(urlOrId);
@@ -37,27 +40,77 @@ function spotifyEmbedUrl(urlOrId, theme = 0) {
   return id ? `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=${theme}` : '';
 }
 
+// 多言語対応のテキストを正規化
+function normalizeLocalizedText(value, fallback = '') {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return {
+      en: String(pick(value, ['en', 'english', 'English'], fallback)),
+      ja: String(pick(value, ['ja', 'jp', 'japanese', 'Japanese'], fallback)),
+    };
+  }
+
+  const text = String(value || fallback);
+  return { en: text, ja: text };
+}
+
+// 曲タイトルを解決する
+function resolveSongTitle(raw, fallback) {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    if ('en' in raw || 'ja' in raw) {
+      return normalizeLocalizedText(raw, fallback);
+    }
+
+    const titleValue = pick(raw, ['title', 'name', 'song', 'trackName', 'track_name', '曲名'], null);
+    return normalizeLocalizedText(titleValue ?? fallback, fallback);
+  }
+
+  return normalizeLocalizedText(raw, fallback);
+}
+
+// 曲説明
+function resolveSongDescription(raw) {
+  const description = pick(raw, ['description', 'desc', 'details', 'note', '説明'], '');
+  if (description && typeof description === 'object' && !Array.isArray(description)) {
+    return getLocalizedText(description, 'en') || getLocalizedText(description, 'ja') || '';
+  }
+  return String(description || '').trim();
+}
+
+// 多言語対応のテキストを取得
+function getLocalizedText(value, language) {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return String(value?.[language] || value?.en || value?.ja || '');
+}
+
+const FORWARD_SCROLL_SPEED_PX_PER_MS = 48 / 1000;
+const HOLD_AT_END_MS = 1000;
+const HOLD_AT_START_MS = 1000;
+
 const songs = Object.entries(modules).flatMap(([path, module]) => {
-  const fileLabel = path.replace('../json/', '').replace(/\.json$/i, '');
+  const fileLabel = path.replace('./assets/json/', '').replace(/\.json$/i, '');
   return flattenJson(module.default, fileLabel).map((raw, index) => {
-    const title = pick(raw, ['title', 'name', 'song', 'trackName', 'track_name', '曲名'], `Untitled ${index + 1}`);
+    const fallbackTitle = `Untitled ${index + 1}`;
+    const title = resolveSongTitle(raw, fallbackTitle);
+    const titleLabel = title.en || title.ja || fallbackTitle;
     const artist = pick(raw, ['artist', 'artists', 'singer', 'vocal', 'artistName', 'artist_name', 'アーティスト']);
+    const description = resolveSongDescription(raw);
     const chapter = pick(raw, ['chapter', 'category', 'album', 'group', 'section', 'チャプター'], fileLabel);
     const previewUrl = pick(raw, ['preview_url', 'previewUrl', 'preview', 'audio', 'audioUrl', 'audio_url']);
     const spotifyUrl = pick(raw, ['spotify_url', 'spotifyUrl', 'spotify', 'external_url', 'externalUrl', 'url']);
     return {
-      id: pick(raw, ['id', 'track_id', 'trackId'], `${fileLabel}-${index}-${title}`),
-      title: String(title),
+      id: pick(raw, ['id', 'track_id', 'trackId'], `${fileLabel}-${index}-${titleLabel}`),
+      title,
       artist: Array.isArray(artist) ? artist.join(', ') : String(artist || ''),
+      description,
       chapter: String(chapter || fileLabel),
       previewUrl: String(previewUrl || ''),
       spotifyUrl: String(spotifyUrl || ''),
-      spotifyId: spotifyEmbedUrl(spotifyUrl) ? String(spotifyUrl) : '',
-      raw,
     };
   });
 });
 
+// ヒープソート
 function* heapTopGenerator(inputItems, limit) {
   const heap = [...inputItems];
   const compare = function* (a, b) {
@@ -94,6 +147,7 @@ function* heapTopGenerator(inputItems, limit) {
   return ranking;
 }
 
+// 入力曲と回答履歴からソート状態を復元
 function resolveSortState(inputSongs, limit, answers) {
   const generator = heapTopGenerator(inputSongs, Math.min(limit, inputSongs.length));
   let ranking = [];
@@ -112,17 +166,7 @@ function resolveSortState(inputSongs, limit, answers) {
   return { battle: next.value, ranking, done: false };
 }
 
-function SongPreview({ song, compact = false, darkMode = false }) {
-  return (
-    <div className={compact ? 'song-preview compact' : 'song-preview'}>
-      <div>
-        <h3>{song.title}</h3>
-      </div>
-      <SongMedia song={song} compact={compact} darkMode={darkMode} />
-    </div>
-  );
-}
-
+// 曲のプレビューを表示
 function SongMedia({ song, compact = false, darkMode = false }) {
   const embedUrl = spotifyEmbedUrl(song.spotifyUrl, darkMode ? 1 : 0);
 
@@ -132,7 +176,7 @@ function SongMedia({ song, compact = false, darkMode = false }) {
         <audio controls src={song.previewUrl} preload="none" />
       ) : embedUrl ? (
         <iframe
-          title={`${song.title} Spotify preview`}
+          title={`${getLocalizedText(song.title, 'en')} Spotify preview`}
           src={embedUrl}
           width="100%"
           height={compact ? '80' : '152'}
@@ -149,10 +193,18 @@ function SongMedia({ song, compact = false, darkMode = false }) {
   );
 }
 
-function AutoScrollTitle({ children }) {
+// ホバー時に見切れたテキストをスクロール
+function HoverScrollText({ as = 'strong', className = '', children, hovered = false, timings = null, onMeasure }) {
   const containerRef = React.useRef(null);
   const textRef = React.useRef(null);
+  const frameRef = React.useRef(0);
+  const startRef = React.useRef(0);
   const [scrollDistance, setScrollDistance] = React.useState(0);
+  const Tag = as;
+
+  React.useEffect(() => {
+    onMeasure?.(scrollDistance);
+  }, [onMeasure, scrollDistance]);
 
   React.useEffect(() => {
     const measure = () => {
@@ -169,14 +221,117 @@ function AutoScrollTitle({ children }) {
     return () => resizeObserver.disconnect();
   }, [children]);
 
+  React.useEffect(() => {
+    const text = textRef.current;
+    if (!text || !hovered || scrollDistance <= 0 || !timings) {
+      cancelAnimationFrame(frameRef.current);
+      startRef.current = 0;
+      if (text) text.style.transform = 'translateX(0px)';
+      return undefined;
+    }
+
+    const { forwardDuration, cycleDuration } = timings;
+    const forwardLimit = forwardDuration;
+    const holdEndLimit = forwardDuration + HOLD_AT_END_MS;
+    const holdStartLimit = holdEndLimit + HOLD_AT_START_MS;
+
+    const tick = (now) => {
+      if (!startRef.current) startRef.current = now;
+      const elapsed = now - startRef.current;
+      const phase = elapsed % cycleDuration;
+      let offset = 0;
+
+      if (phase < forwardLimit) {
+        offset = -Math.min(scrollDistance, phase * FORWARD_SCROLL_SPEED_PX_PER_MS);
+      } else if (phase < holdEndLimit) {
+        offset = -scrollDistance;
+      } else if (phase < holdStartLimit) {
+        offset = 0;
+      } else {
+        offset = 0;
+      }
+
+      text.style.transform = `translateX(${offset}px)`;
+      frameRef.current = requestAnimationFrame(tick);
+    };
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      startRef.current = 0;
+    };
+  }, [timings, hovered, scrollDistance]);
+
   return (
-    <strong
+    <Tag
       ref={containerRef}
-      className={scrollDistance > 0 ? 'auto-title is-overflowing' : 'auto-title'}
-      style={{ '--scroll-distance': `${scrollDistance}px` }}
+      className={`${className} hover-scroll ${scrollDistance > 0 ? 'is-overflowing' : ''}`.trim()}
     >
       <span ref={textRef}>{children}</span>
-    </strong>
+    </Tag>
+  );
+}
+
+// 曲タイトルと説明を表示
+function SelectionSongText({ title, description, showDescription, hovered = false }) {
+  const [titleDistance, setTitleDistance] = React.useState(0);
+  const [descriptionDistance, setDescriptionDistance] = React.useState(0);
+  const hasDescription = showDescription && Boolean(description);
+
+  const timings = React.useMemo(() => {
+    const maxDistance = Math.max(titleDistance, hasDescription ? descriptionDistance : 0);
+    if (maxDistance <= 0) return null;
+
+    const forwardDuration = maxDistance / FORWARD_SCROLL_SPEED_PX_PER_MS;
+    return {
+      forwardDuration,
+      cycleDuration: forwardDuration + HOLD_AT_END_MS + HOLD_AT_START_MS,
+    };
+  }, [descriptionDistance, hasDescription, titleDistance]);
+
+  return (
+    <span className="song-row-text">
+      <HoverScrollText hovered={hovered} timings={timings} onMeasure={setTitleDistance}>
+        {title}
+      </HoverScrollText>
+      {hasDescription ? (
+        <HoverScrollText
+          as="small"
+          className="song-description"
+          hovered={hovered}
+          timings={timings}
+          onMeasure={setDescriptionDistance}
+        >
+          {description}
+        </HoverScrollText>
+      ) : null}
+    </span>
+  );
+}
+
+// 曲選択用の行
+function SelectionSongRow({ song, language, showDescriptions, selected, onToggle }) {
+  const [hovered, setHovered] = React.useState(false);
+
+  return (
+    <label className="song-row" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <input type="checkbox" checked={selected} onChange={() => onToggle(song.id)} />
+      <SelectionSongText title={getLocalizedText(song.title, language)} description={song.description} showDescription={showDescriptions} hovered={hovered} />
+    </label>
+  );
+}
+
+// 表示言語切替ボタン
+function LanguageToggle({ language, setLanguage }) {
+  return (
+    <div className="language-switch" role="group" aria-label="表示言語">
+      <button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')} aria-pressed={language === 'en'}>
+        EN
+      </button>
+      <button className={language === 'ja' ? 'active' : ''} onClick={() => setLanguage('ja')} aria-pressed={language === 'ja'}>
+        日本語
+      </button>
+    </div>
   );
 }
 
@@ -190,6 +345,8 @@ function App() {
   const [answers, setAnswers] = React.useState([]);
   const [mode, setMode] = React.useState('select');
   const [darkMode, setDarkMode] = React.useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false);
+  const [language, setLanguage] = React.useState('en');
+  const [showDescriptions, setShowDescriptions] = React.useState(true);
   React.useEffect(() => {
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
   }, [darkMode]);
@@ -198,7 +355,7 @@ function App() {
   const filteredSongs = React.useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return songs;
-    return songs.filter((song) => [song.title, song.chapter].join(' ').toLowerCase().includes(needle));
+    return songs.filter((song) => [getLocalizedText(song.title, 'en'), getLocalizedText(song.title, 'ja'), song.chapter].join(' ').toLowerCase().includes(needle));
   }, [query]);
   const songsByChapter = React.useMemo(
     () =>
@@ -209,6 +366,7 @@ function App() {
     [chapters, filteredSongs],
   );
 
+  // 曲選択を切替
   function toggleSong(id) {
     setSelectedIds((current) => {
       const next = new Set(current);
@@ -217,6 +375,7 @@ function App() {
     });
   }
 
+  // チャプター単位で曲選択を切替
   function setChapter(chapter, checked) {
     setSelectedIds((current) => {
       const next = new Set(current);
@@ -227,6 +386,7 @@ function App() {
     });
   }
 
+  // ソート開始
   function startSort() {
     const state = resolveSortState(selectedSongs, limit, []);
     setAnswers([]);
@@ -235,6 +395,7 @@ function App() {
     setMode('sort');
   }
 
+  // 選択肢を選ぶ
   function choose(side) {
     const nextAnswers = [...answers, side];
     const state = resolveSortState(selectedSongs, limit, nextAnswers);
@@ -244,6 +405,7 @@ function App() {
     setMode(state.done ? 'result' : 'sort');
   }
 
+  // 一つ戻る
   function undoChoice() {
     const nextAnswers = answers.slice(0, -1);
     const state = resolveSortState(selectedSongs, limit, nextAnswers);
@@ -253,6 +415,7 @@ function App() {
     setMode('sort');
   }
 
+  // 初期画面に戻る
   function reset() {
     setBattle(null);
     setRanking([]);
@@ -273,12 +436,21 @@ function App() {
     <main>
       <header className="app-header">
         <div>
-          <p>version {packageJson.version}</p>
+          <p>ver {packageJson.version}</p>
           <h1>DELTARUNE 曲ソート</h1>
         </div>
         <div className="header-actions">
+          <LanguageToggle language={language} setLanguage={setLanguage} />
+          <button
+            className="icon-button"
+            onClick={() => setShowDescriptions((value) => !value)}
+            aria-label={showDescriptions ? '詳細表示をオフにする' : '詳細表示をオンにする'}
+            aria-pressed={showDescriptions}
+          >
+            {showDescriptions ? <Eye size={21} /> : <EyeOff size={21} />}
+          </button>
           <button className="icon-button" onClick={() => setDarkMode((value) => !value)} aria-label={darkMode ? 'ライトモードに切替' : 'ダークモードに切替'}>
-            {darkMode ? <Sun size={21} /> : <Moon size={21} />}
+            {darkMode ? <Moon size={21} /> : <Sun size={21} />}
           </button>
           <div className="header-count">
             <ListChecks size={20} />
@@ -287,6 +459,7 @@ function App() {
         </div>
       </header>
 
+      {/* 選択画面 */}
       {mode === 'select' && (
         <section className="workspace">
           <section className="panel song-list-panel">
@@ -332,12 +505,14 @@ function App() {
                   </label>
                   <div className="chapter-songs">
                     {chapterSongs.map((song) => (
-                      <label key={song.id} className="song-row">
-                        <input type="checkbox" checked={selectedIds.has(song.id)} onChange={() => toggleSong(song.id)} />
-                        <span>
-                          <AutoScrollTitle>{song.title}</AutoScrollTitle>
-                        </span>
-                      </label>
+                      <SelectionSongRow
+                        key={song.id}
+                        song={song}
+                        language={language}
+                        showDescriptions={showDescriptions}
+                        selected={selectedIds.has(song.id)}
+                        onToggle={toggleSong}
+                      />
                     ))}
                   </div>
                 </section>
@@ -347,6 +522,7 @@ function App() {
         </section>
       )}
 
+      {/* ソート画面 */}
       {mode === 'sort' && battle && (
         <section className="sort-screen">
           <div className="sort-topbar">
@@ -364,7 +540,8 @@ function App() {
           </div>
           <div className="battle-grid">
             <article className="choice-card">
-              <h3>{battle.left.title}</h3>
+              <h3>{getLocalizedText(battle.left.title, language)}</h3>
+              {showDescriptions && battle.left.description ? <p className="song-description choice-description">{battle.left.description}</p> : null}
               <div className="choice-bottom">
                 <SongMedia song={battle.left} darkMode={darkMode} />
                 <button onClick={() => choose('left')}>
@@ -374,7 +551,8 @@ function App() {
               </div>
             </article>
             <article className="choice-card">
-              <h3>{battle.right.title}</h3>
+              <h3>{getLocalizedText(battle.right.title, language)}</h3>
+              {showDescriptions && battle.right.description ? <p className="song-description choice-description">{battle.right.description}</p> : null}
               <div className="choice-bottom">
                 <SongMedia song={battle.right} darkMode={darkMode} />
                 <button onClick={() => choose('right')}>
@@ -387,12 +565,13 @@ function App() {
         </section>
       )}
 
+      {/* 結果表示 */}
       {mode === 'result' && (
         <section className="result-screen">
           <div className="result-header">
             <div>
               <p>{answers.length} 回の比較で決定</p>
-              <h2>ランキング</h2>
+              <h2>ソート結果</h2>
             </div>
             <div className="result-actions">
               <button className="start-button secondary" onClick={reset}>
@@ -407,8 +586,8 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{index + 1}</span>
                   <div>
-                    <strong>{song.title}</strong>
-                    <small>{song.chapter}</small>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}
@@ -418,8 +597,8 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{offset + 3}</span>
                   <div>
-                    <strong>{song.title}</strong>
-                    <small>{song.chapter}</small>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}
@@ -429,8 +608,8 @@ function App() {
                 <li key={song.id}>
                   <span className="rank">{offset + 11}</span>
                   <div>
-                    <strong>{song.title}</strong>
-                    <small>{song.chapter}</small>
+                    <strong>{getLocalizedText(song.title, language)}</strong>
+                    <small className="song-meta">{showDescriptions && song.description ? `${song.chapter}・${song.description}` : song.chapter}</small>
                   </div>
                 </li>
               ))}

@@ -108,6 +108,30 @@ h2 {
   gap: 12px;
 }
 
+.language-switch {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--control);
+  border-radius: 8px;
+}
+
+.language-switch button {
+  min-width: 54px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.language-switch .active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -305,6 +329,12 @@ h2 {
   background: var(--surface);
 }
 
+.song-row-text {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
 .song-row span,
 .ranking-list div {
   min-width: 0;
@@ -320,38 +350,48 @@ h2 {
   white-space: nowrap;
 }
 
-.auto-title {
+.song-description {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.song-row .song-description.hover-scroll {
+  white-space: nowrap;
+}
+
+.choice-card .song-description {
+  font-size: 0.98rem;
+}
+
+.song-meta {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.choice-description {
+  margin: -10px 0 0;
+}
+
+.hover-scroll {
   --scroll-distance: 0px;
+  --scroll-motion-duration: 0s;
+  --scroll-cycle-duration: 0s;
+  --scroll-speed-factor: 1;
+  --scroll-progress: 0;
   position: relative;
   display: block;
   overflow: hidden;
   min-height: 1.5em;
 }
 
-.auto-title span {
+.hover-scroll span {
   display: inline-block;
   min-width: max-content;
   will-change: transform;
-}
-
-.auto-title.is-overflowing span {
-  animation: title-marquee 8s ease-in-out infinite;
-}
-
-@keyframes title-marquee {
-  0%,
-  18% {
-    transform: translateX(0);
-  }
-
-  62%,
-  82% {
-    transform: translateX(calc(-1 * var(--scroll-distance)));
-  }
-
-  100% {
-    transform: translateX(0);
-  }
 }
 
 .sort-screen,
